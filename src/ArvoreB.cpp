@@ -18,21 +18,12 @@ ArvoreB::~ArvoreB(){
 /**************************METODOS PUBLICOS**************************/
 bool ArvoreB::insert(std::string chaveAInserir, int posNoDisco){
 
-	//std::cout<<"Altura da Arvore: "<<height<<std::endl;
-	//::cout<<"noMap> ";
-	/*for(int i = 0; i<(int)noMap.size();i++){
+	std::cout<<"Altura da Arvore: "<<height<<std::endl;
+	std::cout<<"noMap> ";
+	for(int i = 0; i<(int)noMap.size();i++){
 		std::cout<<noMap[i]->getPagina()<<"|";
 	}
-	std::cout<<std::endl;*/
-
-	for(int i = 0; i<(int)noMap.size();i++){
-		for(int j = 0; j < noMap[i]->getContador(); j++){
-			if(chaveAInserir.compare(noMap[i]->getChave(j)) == 0){
-				std::cout<<"ERROR: Nao e possivel inserir chaves duplicadas."<<std::endl;
-				return false;
-			} 
-		}
-	}
+	std::cout<<std::endl;
 
 	if(noMap.size()>0){
 		for(int i = 0; i < (int)noMap.size(); i++){
@@ -51,7 +42,7 @@ bool ArvoreB::insert(std::string chaveAInserir, int posNoDisco){
 void ArvoreB::print(){
 
 	Utils util;		
-	//util.clear();
+	util.clear();
 
 	for(int i = height; i >= 0; i--){
 		std::cout<<"N"<<i<<":\n";
@@ -91,54 +82,9 @@ void ArvoreB::print(){
 
 }
 
-int ArvoreB::seek(std::string chave){
-	No* noAtual;
-
-	if(noMap.size()==0){
-		std::cout<<"A arvore esta vazia."<<std::endl;
-		return -1;
-	}
-
-	std::cout<<"Chave a ser encontrada: "<<chave<<std::endl;
-	for(int i = 0; i < (int)noMap.size(); i++){
-		if(noMap[i]->getNivel() == height){
-			//Realiza busca binaria ate encontrar a chave
-			noAtual = noMap[i];
-			for(int j = 0; j < height+1; j++){
-				//std::cout<<"\n";
-				for(int k = 0; k < noAtual->getContador(); k++){
-
-					//std::cout<<noAtual->getChave(k)<<"|";
-					if((chave.compare(noAtual->getChave(k))) == 0){
-						std::cout<<"Numero de seeks para encontrar a chave: "<<j+1<<std::endl;
-						return noAtual->getPrr(k);
-					}
-
-					if((chave.compare(noAtual->getChave(k))) < 0){
-						if(noAtual->getFilho(k) != NULL){ 
-							noAtual = noAtual->getFilho(k);
-							break;
-						}
-						else{
-							return -1;
-						}
-					}
-
-					if(k+1 == noAtual->getContador()){
-						if(noAtual->getFilho(k+1) != NULL){ 
-							noAtual = noAtual->getFilho(k+1);
-						}else{
-							return -1;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	return -1;
+void ArvoreB::seek(){
+std::cout<<"\nBuscando...\n";
 }
-
 /**************************METODOS PRIVADOS***************************/
 No* ArvoreB::buscaPosInsercao(No* noAtual, std::string chaveAInserir){
 
@@ -172,6 +118,7 @@ No* ArvoreB::buscaPosInsercao(No* noAtual, std::string chaveAInserir){
 
 bool ArvoreB::inserirNo(No* noAtual, std::string chaveAInserir, int posNoDisco, No* noFilho, No* noIrmao){
 	
+	bool success = true;
 	int posInsercao = noAtual->insert(chaveAInserir, posNoDisco);
 	std::cout<<"No: "<<noAtual->getPagina()<<" -> "<<"Chave "<<chaveAInserir<<" inserida na posicao "<<posInsercao<<std::endl;
 
@@ -180,21 +127,12 @@ bool ArvoreB::inserirNo(No* noAtual, std::string chaveAInserir, int posNoDisco, 
 
 	if(noFilho != NULL){
 		noAtual->setFilho(noFilho, posInsercao);
-		std::cout<<"No "<<noFilho->getPagina()<<" agora e filho de no "<< noAtual->getPagina()<<" na posicao "<<posInsercao<<std::endl;
-		noFilho->setPai(noAtual);
-
-		if(noIrmao != NULL) {
-			noAtual->setFilho(noIrmao, posInsercao+1);
-			std::cout<<"No "<<noIrmao->getPagina()<<" agora e filho de no "<< noAtual->getPagina()<<" na posicao "<<posInsercao+1<<std::endl;
-			noIrmao->setPai(noAtual);
-			
-		}
+		if(noIrmao != NULL) noAtual->setFilho(noIrmao, posInsercao+1);
 	}
-
 
 	if(noAtual->getContador()>4){
 		if(noAtual->getPai()==NULL){
-			std::cout<<"Cria No pai"<<std::endl;
+			std::cout<<"Cria No pai->"<<std::endl;
 			No* pai = new No;
 			pai->setNivel(noAtual->getNivel()+1);
 			height = pai->getNivel();
@@ -209,11 +147,10 @@ bool ArvoreB::inserirNo(No* noAtual, std::string chaveAInserir, int posNoDisco, 
 		noMap[irmao->getPagina()] = irmao;
 
 		std::cout<<"Inserir chave[2] no pai"<<std::endl;
-		inserirNo(noAtual->getPai(), noAtual->getChave(2), noAtual->getPrr(2), noAtual, irmao);
+		success = inserirNo(noAtual->getPai(), noAtual->getChave(2), noAtual->getPrr(2), noAtual, irmao);
 
 		std::cout<<"Inserir chave[3] no irmao"<<std::endl;
 		inserirNo(irmao, noAtual->getChave(3), noAtual->getPrr(3), noAtual->getFilho(3), NULL);
-
 		std::cout<<"Inserir chave[4] no irmao"<<std::endl;
 		inserirNo(irmao, noAtual->getChave(4), noAtual->getPrr(4), noAtual->getFilho(4), noAtual->getFilho(5));
 
@@ -221,12 +158,11 @@ bool ArvoreB::inserirNo(No* noAtual, std::string chaveAInserir, int posNoDisco, 
 
 			std::cout<<"Apagando "<<noAtual->getChave(j)<<" do No "<<noAtual->getPagina()<<std::endl;
 			noAtual->erase(noAtual->getChave(j));
-			//print();
 		}
 
 	}
 
-	return true;
+	return success;
 }
 /**************************SETTERS & GETTERS**************************/
 void ArvoreB::setHeight(int h){
